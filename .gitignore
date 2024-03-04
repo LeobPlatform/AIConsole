@@ -71,4 +71,3 @@ obj/
 *.infolog
 *.debuglog
 .Development/
-Dubhe.Core/Test/
