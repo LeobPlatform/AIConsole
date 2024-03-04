@@ -1,0 +1,129 @@
+﻿@{
+    ViewBag.Title = "Download";
+}
+
+<style>
+    .container {
+        display: flex;
+        height: 100%;
+    }
+
+    .page-container {
+        margin: auto;
+        width: 100%;
+        max-width: 30rem;
+    }
+
+    .sign-logo {
+        text-align: center;
+    }
+
+    .box {
+        font-size: .875rem;
+        font-weight: 500;
+    }
+
+        .box .sign-box-title {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .box label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .box .form-item {
+            margin-bottom: 1rem;
+        }
+
+            .box .form-item d-input {
+                width: 100%;
+            }
+
+        .box .form-footer {
+            margin-top: 2rem;
+        }
+
+    #sign-in-button {
+        width: 100%;
+    }
+</style>
+
+<div class="container">
+    <div class="page-container">
+        <div class="sign-logo">
+            <img src="@ViewBag.SiteLogoUrl" width="150" />
+        </div>
+        <box class="box">
+            <h2 class="sign-box-title">Download VisionModel Images For Training</h2>
+            <form id="DownloadTraining" method="post">
+                <div class="form-item">
+                    <label for="BlockOneID">BlockOneID</label>
+                    <input tabindex=1 name="BlockOneID" id="BlockOneID" value="Savannah"></input>
+                </div>
+                <div class="form-item">
+                    <label for="Status">Status</label>
+                    <select tabindex=1 name="Status" id="Status" value="1">
+                        <option></option>
+                        <option value="0">0) Unassigned</option>
+                        <option selected value="1">1) Training Set</option>
+                        <option value="2">2) Verify Set</option>
+                        <option value="3">3) Test Set</option>
+                        <option value="4">4) Pattern Set</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label for="WCSID">WCSID</label>
+                    <input tabindex=1 name="WCSID" id="WCSID" type="number" value="1"></input>
+                </div>
+                <div class="form-item">
+                    <label for="Surface">Surface</label>
+                    <select tabindex=1 name="Surface" id="Surface">
+                        <option value="1">1) Side</option>
+                        <option value="2">2) Top</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label for="PageIndex">PageIndex</label>
+                    <input tabindex=1 name="PageIndex" id="PageIndex" type="number" value="0"></input>
+                </div>
+                <div class="form-item">
+                    <label for="PageSize">PageSize</label>
+                    <input tabindex=1 name="PageSize" id="PageSize" type="number" value="1000"></input>
+                </div>
+                <div class="form-footer">
+                    <button tabindex=3 color="primary" id="submit-button" type="submit">Download</button>
+                </div>
+            </form>
+        </box>
+    </div>
+</div>
+
+<script>
+    const submitBtn = document.getElementById("submit-button");
+    const BlockOneID = document.getElementById("BlockOneID").value;
+    const Status = document.getElementById("Status").value;
+    const WCSID = document.getElementById("WCSID").value;
+    const Surface = document.getElementById("Surface").value;
+    const PageIndex = document.getElementById("PageIndex").value;
+    const PageSize = document.getElementById("PageSize").value;
+    const DownloadTrainingForm = document.getElementById("DownloadTraining");
+
+    DownloadTrainingForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (submitBtn.textContent !== "loading") {
+            submitBtn.textContent = "loading";
+            await download(BlockOneID, Status, WCSID, Surface, PageIndex, PageSize);
+            loginBtn.textContent = "";
+        }
+    });
+
+    async function download(BlockOneID, Status, WCSID, Surface, PageIndex, PageSize) {
+        const url = "/API/DownloadVisionModelImagesForTraining?BlockOneID=" + BlockOneID + "&Status=" + Status + "&WCSID=" + WCSID + "&Surface=" + Surface + "&PageIndex=" + PageIndex + "&PageSize=" + PageSize;
+        const resp = await fetch(url);
+
+        return await resp.json();
+    }
+</script>
