@@ -56,34 +56,19 @@
             <img src="@ViewBag.SiteLogoUrl" width="150" />
         </div>
         <box class="box">
-            <h2 class="sign-box-title">Download VisionModel Images For Training</h2>
+            <h2 class="sign-box-title">Download VisionModel Images For Daily</h2>
             <form id="DownloadForm" method="post">
                 <div class="form-item">
                     <label for="BlockOneID">BlockOneID</label>
                     <input tabindex=1 name="BlockOneID" id="BlockOneID" value="Savannah2405"></input>
                 </div>
                 <div class="form-item">
-                    <label for="Status">Status</label>
-                    <select tabindex=1 name="Status" id="Status" value="1">
-                        <option></option>
-                        <option value="0">0) Unassigned</option>
-                        <option selected value="1">1) Training Set</option>
-                        <option value="2">2) Verify Set</option>
-                        <option value="3">3) Test Set</option>
-                        <option value="4">4) Pattern Set</option>
-                    </select>
-                </div>
-                <div class="form-item">
                     <label for="WCSID">WCSID</label>
-                    <input tabindex=1 name="WCSID" id="WCSID" type="number" value="1"></input>
+                    <input tabindex=1 name="WCSID" id="WCSID" type="number" value="1" type="number"></input>
                 </div>
                 <div class="form-item">
-                    <label for="Surface">Surface</label>
-                    <select tabindex=1 name="Surface" id="Surface">
-                        <option value="0">Side and Top</option>
-                        <option value="1">1) Side</option>
-                        <option value="2">2) Top</option>
-                    </select>
+                    <label for="IntervalDays">IntervalDays</label>
+                    <input tabindex=1 name="IntervalDays" id="IntervalDays" value="7" type="number"></input>
                 </div>
                 <div class="form-item">
                     <label for="PageIndex">PageIndex</label>
@@ -111,23 +96,22 @@
 
         const submitBtn = document.getElementById("submit-button");
         const BlockOneID = document.getElementById("BlockOneID").value;
-        const Status = document.getElementById("Status").value;
         const WCSID = document.getElementById("WCSID").value;
-        const Surface = document.getElementById("Surface").value;
+        const IntervalDays = document.getElementById("IntervalDays").value;
         const PageIndex = document.getElementById("PageIndex").value;
         const PageSize = document.getElementById("PageSize").value;
 
         if (submitBtn.textContent !== "loading") {
             submitBtn.textContent = "loading";
             submitBtn.disabled = true;
-            const result = await download(BlockOneID, Status, WCSID, Surface, PageIndex, PageSize);
+            const result = await download(BlockOneID, WCSID, IntervalDays, PageIndex, PageSize);
             submitBtn.textContent = "Download";
             document.getElementById("result").innerText = JSON.stringify(result);
         }
     });
 
-    async function download(BlockOneID, Status, WCSID, Surface, PageIndex, PageSize) {
-        const url = "/API/DownloadVisionModelImagesForTraining?BlockOneID=" + BlockOneID + "&Status=" + Status + "&WCSID=" + WCSID + "&Surface=" + Surface + "&PageIndex=" + PageIndex + "&PageSize=" + PageSize;
+    async function download(BlockOneID, WCSID, IntervalDays, PageIndex, PageSize) {
+        const url = "/API/DownloadBoxVisionImagesForDaily?BlockOneID=" + BlockOneID + "&WCSID=" + WCSID + "&IntervalDays=" + IntervalDays + "&PageIndex=" + PageIndex + "&PageSize=" + PageSize;
         const resp = await fetch(url);
 
         return await resp.json();

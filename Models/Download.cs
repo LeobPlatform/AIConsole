@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace AIConsole.Models
 {
@@ -30,8 +31,8 @@ namespace AIConsole.Models
         public string WCSName { get; set; }
         public string SideImageName { get; set; }
         public string TopImageName { get; set; }
-        public string TopImageURL { get; set; }
         public string SideImageURL { get; set; }
+        public string TopImageURL { get; set; }
     }
 
     public class NoReadImageData
@@ -56,28 +57,70 @@ namespace AIConsole.Models
         public async Task<string> DownloadVisionModelImagesForTraining(string BlockOneID, int Status, int WCSID, int Surface, int PageIndex, int PageSize)
         {
             List<TrainingImageData> ImageData = await _dataService.GetVisionModelImagesForTraining(BlockOneID, Status, WCSID, Surface, PageIndex, PageSize);
-            int index = 0;
+
+            Dictionary<string,List<TrainingImageData>> result = new Dictionary<string,List<TrainingImageData>>();
+            result.Add("Success",new List<TrainingImageData>());
+            result.Add("Fsiled",new List<TrainingImageData>());
             foreach (var item in ImageData)
             {
-                await DownloadFile("https://dubhe-tenant-public-files.s3.amazonaws.com/" + item.FileKey, index + ".jpg", "\\\\10.0.20.73\\NetworkShare\\JianhuaTest");
-                index += 1;
+                string savePath = $"\\\\10.0.20.73\\NetworkShare\\JianhuaTest\\Customer\\Savannah\\VisionModelImagesForTraining\\{item.WCSName}\\{item.WCSModuleName??"-"}\\{item.Tags}\\{item.ProductID}";
+                if (await DownloadFile(item.URL, item.FileName, savePath))
+                {
+                    result["Success"].Add(item);
+                }
+                else
+                {
+                    result["Fsiled"].Add(item);
+                }
             }
 
-            return "";
+            return JsonConvert.SerializeObject(result);
         }
 
         public async Task<string> DownloadBoxVisionImagesForDaily(string BlockOneID, int WCSID, int IntervalDays, int PageIndex, int PageSize)
         {
             List<DailyImageData> ImageData = await _dataService.DownloadBoxVisionImagesForDaily(BlockOneID, WCSID, IntervalDays, PageIndex, PageSize);
 
-            return "";
+            Dictionary<string, List<DailyImageData>> result = new Dictionary<string, List<DailyImageData>>();
+            result.Add("Success", new List<DailyImageData>());
+            result.Add("Fsiled", new List<DailyImageData>());
+            foreach (var item in ImageData)
+            {
+                string savePath = $"\\\\10.0.20.73\\NetworkShare\\JianhuaTest\\Customer\\Savannah\\BoxVisionImagesForDaily\\{item.WCSName}\\{item.WCSModuleName ?? "-"}\\{item.ProductID}";
+                if (await DownloadFile(item.TopImageURL, item.TopImageName, savePath) && await DownloadFile(item.SideImageURL, item.SideImageName, savePath))
+                {
+                    result["Success"].Add(item);
+                }
+                else
+                {
+                    result["Fsiled"].Add(item);
+                }
+            }
+
+            return JsonConvert.SerializeObject(result);
         }
 
         public async Task<string> DownloadBoxVisionImagesForNoRead(string BlockOneID, int WCSID, int IntervalDays, int PageIndex, int PageSize)
         {
             List<NoReadImageData> ImageData = await _dataService.DownloadBoxVisionImagesForNoRead(BlockOneID, WCSID, IntervalDays, PageIndex, PageSize);
 
-            return "";
+            Dictionary<string, List<NoReadImageData>> result = new Dictionary<string, List<NoReadImageData>>();
+            result.Add("Success", new List<NoReadImageData>());
+            result.Add("Fsiled", new List<NoReadImageData>());
+            foreach (var item in ImageData)
+            {
+                string savePath = $"\\\\10.0.20.73\\NetworkShare\\JianhuaTest\\Customer\\Savannah\\VisionModelImagesForTraining\\{item.WCSName}\\{item.WCSModuleName ?? "-"}\\{item.Tags}";
+                if (await DownloadFile(item.URL, item.FileName, savePath))
+                {
+                    result["Success"].Add(item);
+                }
+                else
+                {
+                    result["Fsiled"].Add(item);
+                }
+            }
+
+            return JsonConvert.SerializeObject(result);
         }
 
         /// <summary>
